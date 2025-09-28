@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tradingbot.tradingbot.model.AuthResponse;
-import com.tradingbot.tradingbot.model.User;
+import com.tradingbot.tradingbot.model.dto.auth.AuthResponse;
 import com.tradingbot.tradingbot.model.dto.auth.ErrorResponse;
 import com.tradingbot.tradingbot.model.dto.auth.LoginRequest;
 import com.tradingbot.tradingbot.model.dto.auth.LogoutResponse;
