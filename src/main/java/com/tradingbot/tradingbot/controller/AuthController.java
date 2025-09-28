@@ -29,7 +29,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            User user = authService.register(
+            authService.register(
                 request.getUsername(),
                 request.getEmail(),
                 request.getPassword()

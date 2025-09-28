@@ -69,7 +69,7 @@ public class AuthService {
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
 
-        return new AuthResponse(accessToken, refreshToken, user);
+        return new AuthResponse(accessToken, refreshToken);
     }
 
     public AuthResponse refreshAccessToken(String refreshToken) {
@@ -81,7 +81,7 @@ public class AuthService {
         user.setRefreshToken(newRefreshToken);
         userRepository.save(user);
 
-        return new AuthResponse(newAccessToken, newRefreshToken, user);
+        return new AuthResponse(newAccessToken, newRefreshToken);
     }
 
     public void logout(String refreshToken) {
