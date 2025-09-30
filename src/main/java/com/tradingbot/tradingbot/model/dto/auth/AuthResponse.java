@@ -1,4 +1,4 @@
-package com.tradingbot.tradingbot.model;
+package com.tradingbot.tradingbot.model.dto.auth;
 
 public class AuthResponse {
     private String accessToken;

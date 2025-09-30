@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.tradingbot.tradingbot.model.AuthResponse;
+import com.tradingbot.tradingbot.config.ApiException;
 import com.tradingbot.tradingbot.model.User;
+import com.tradingbot.tradingbot.model.dto.auth.AuthResponse;
 import com.tradingbot.tradingbot.repository.UserRepository;
 
 @Service
@@ -39,11 +41,11 @@ public class AuthService {
         validatePassword(password);
 
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Username already exists");
         }
 
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
         User user = new User();
@@ -57,10 +59,10 @@ public class AuthService {
 
     public AuthResponse login(String username, String password) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid username or password"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
 
         String accessToken = jwtUtil.generateToken(user);
@@ -74,7 +76,7 @@ public class AuthService {
 
     public AuthResponse refreshAccessToken(String refreshToken) {
         User user = userRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid refresh token"));
 
         String newAccessToken = jwtUtil.generateToken(user);
         String newRefreshToken = generateRefreshToken();
@@ -86,7 +88,7 @@ public class AuthService {
 
     public void logout(String refreshToken) {
         User user = userRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Invalid refresh token"));
         
         user.setRefreshToken(null);
         userRepository.save(user);
@@ -94,37 +96,42 @@ public class AuthService {
 
     private void validateEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
-            throw new RuntimeException("Email is required");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Email is required");
         }
         
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new RuntimeException("Invalid email format");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid email format");
         }
     }
 
     private void validatePassword(String password) {
         if (password == null || password.length() < MIN_PASSWORD_LENGTH) {
-            throw new RuntimeException("Password must be at least " + MIN_PASSWORD_LENGTH + " characters long");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Password must be at least " + MIN_PASSWORD_LENGTH + " characters long");
         }
 
         if (!UPPERCASE_PATTERN.matcher(password).matches()) {
-            throw new RuntimeException("Password must contain at least one uppercase letter");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Password must contain at least one uppercase letter");
         }
 
         if (!LOWERCASE_PATTERN.matcher(password).matches()) {
-            throw new RuntimeException("Password must contain at least one lowercase letter");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Password must contain at least one lowercase letter");
         }
 
         if (!DIGIT_PATTERN.matcher(password).matches()) {
-            throw new RuntimeException("Password must contain at least one digit");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Password must contain at least one digit");
         }
 
         if (!SPECIAL_CHAR_PATTERN.matcher(password).matches()) {
-            throw new RuntimeException("Password must contain at least one special character");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Password must contain at least one special character");
         }
     }
 
     private String generateRefreshToken() {
         return UUID.randomUUID().toString();
+    }
+
+    public User getUserFromId(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
     }
 }

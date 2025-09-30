@@ -1,5 +1,7 @@
 package com.tradingbot.tradingbot.model.dto.auth;
 
+import com.tradingbot.tradingbot.model.User;
+
 public class ProfileResponse {
     private String username;
     private String email;
@@ -9,6 +11,12 @@ public class ProfileResponse {
         this.username = username;
         this.email = email;
         this.roles = roles;
+    }
+
+    public ProfileResponse(User user) {
+        this.username = user.getUsername();
+        this.email = user.getEmail();
+        this.roles = user.getRoles().toString();
     }
 
     public String getUsername() {
