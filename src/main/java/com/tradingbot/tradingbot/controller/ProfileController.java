@@ -8,7 +8,7 @@ import com.tradingbot.tradingbot.model.dto.auth.ProfileResponse;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -20,9 +20,8 @@ public class ProfileController {
     
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> getProfile(Authentication authentication) {
+    public ResponseEntity<?> getProfile(@AuthenticationPrincipal User user) {
         try {
-            User user = (User) authentication.getPrincipal();
             ProfileResponse response = new ProfileResponse(
                 user.getUsername(),
                 user.getEmail(),
