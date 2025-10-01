@@ -2,6 +2,9 @@ package com.tradingbot.tradingbot.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +12,7 @@ import com.tradingbot.tradingbot.config.ApiException;
 import com.tradingbot.tradingbot.model.StockAlert;
 import com.tradingbot.tradingbot.model.User;
 import com.tradingbot.tradingbot.model.Watchlist;
+import com.tradingbot.tradingbot.model.dto.watchlist.WatchlistResponse;
 import com.tradingbot.tradingbot.repository.WatchlistRepository;
 
 @Service
@@ -50,5 +54,19 @@ public class WatchlistService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Stock alert not found in watchlist");
         }
         return watchlist;
+    }
+
+    public Page<WatchlistResponse> getWatchlistByUser(User user, Pageable pageable) {
+        Page<Watchlist> watchlistPage = watchlistRepository.findAllByUser(user, pageable);
+
+        if (watchlistPage.isEmpty()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "No watchlist found");
+        }
+
+        return watchlistPage.map(this::convertToResponse);
+    }
+
+    private WatchlistResponse convertToResponse(Watchlist watchlist) {
+        return new WatchlistResponse(watchlist);
     }
 }

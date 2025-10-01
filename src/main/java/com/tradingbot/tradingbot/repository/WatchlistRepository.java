@@ -1,9 +1,15 @@
 package com.tradingbot.tradingbot.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.tradingbot.tradingbot.model.User;
 import com.tradingbot.tradingbot.model.Watchlist;
 
 @Repository
-public interface WatchlistRepository extends JpaRepository<Watchlist, Long> {}
+public interface WatchlistRepository extends JpaRepository<Watchlist, Long> {
+
+    Page<Watchlist> findAllByUser(User user, Pageable pageable);
+}

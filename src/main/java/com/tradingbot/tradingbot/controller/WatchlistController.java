@@ -16,7 +16,11 @@ import com.tradingbot.tradingbot.service.StockAlertService;
 import com.tradingbot.tradingbot.service.StockService;
 import com.tradingbot.tradingbot.service.WatchlistService;
 
+import java.util.List;
+
 import org.hibernate.Remove;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +28,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -75,6 +82,11 @@ public class WatchlistController {
         StockAlert stockAlert = stockAlertService.getStockAlertById(removeStockAlertRequest.getStockAlertId());
         watchlistService.removeStockAlertFromWatchlist(watchlist, stockAlert);
         return ResponseEntity.noContent().build(); 
+    }
+    
+    @GetMapping("/get")
+    public Page<WatchlistResponse> getUserWatchlist(@AuthenticationPrincipal User user, Pageable pageable) {
+        return watchlistService.getWatchlistByUser(user, pageable);
     }
     
 }

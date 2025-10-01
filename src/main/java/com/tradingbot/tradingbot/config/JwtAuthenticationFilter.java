@@ -34,6 +34,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
             FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // Permettre l'accès à Swagger, API docs et auth sans authentification
+        if (path.startsWith("/v3/api-docs") || 
+            path.startsWith("/swagger-ui") || 
+            path.startsWith("/swagger-ui.html") ||
+            path.equals("/swagger-ui/index.html") ||
+            path.startsWith("/swagger-resources") ||
+            path.startsWith("/webjars") ||
+            path.startsWith("/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+
         final String requestTokenHeader = request.getHeader("Authorization");
 
         String username = null;
